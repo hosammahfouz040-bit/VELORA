@@ -19,7 +19,7 @@ jobs:
       - name: Extract VELORA source
         run: |
           mkdir -p source
-          unzip -q VELORA_external_build_2026-10-27.zip -d source
+          unzip -q VELORA_GitHub_source_2026-10-27.zip -d source
           find source -name pubspec.yaml -print
           test -n "$(find source -name pubspec.yaml -print -quit)"
 

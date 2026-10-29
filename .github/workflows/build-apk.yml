@@ -85,17 +85,13 @@ jobs:
           echo "=== Starting release build ==="
           timeout 20m flutter build apk --release --verbose 2>&1 \
             | tee "$GITHUB_WORKSPACE/velora-build.log"
+
       - name: Upload build log
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: VELORA-Build-Log
           path: ${{ github.workspace }}/velora-build.log
-          if-no-files-found: warn
-          retention-days: 7
-        
-          name: VELORA-Build-Log
-          path: velora-build.log
           if-no-files-found: warn
           retention-days: 7
 

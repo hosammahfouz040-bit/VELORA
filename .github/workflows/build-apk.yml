@@ -93,7 +93,7 @@ jobs:
           path: ${{ github.workspace }}/velora-build.log
           if-no-files-found: warn
           retention-days: 7
-        with:
+        
           name: VELORA-Build-Log
           path: velora-build.log
           if-no-files-found: warn

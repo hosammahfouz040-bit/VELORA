@@ -1,0 +1,44 @@
+
+name: VELORA - Inspect Gradle Files
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Extract VELORA ZIP
+        shell: bash
+        run: |
+          set -euo pipefail
+          unzip -t velora-github-source.zip
+          mkdir -p extracted
+          unzip -q velora-github-source.zip -d extracted
+          test -f extracted/velora/pubspec.yaml
+          echo "VELORA ZIP extracted successfully."
+
+      - name: Print Gradle configuration
+        shell: bash
+        run: |
+          set -euo pipefail
+          find extracted/velora/android -type f \
+            \( -name 'build.gradle' \
+            -o -name 'build.gradle.kts' \
+            -o -name 'gradle.properties' \
+            -o -name 'gradle-wrapper.properties' \
+            -o -name 'settings.gradle' \
+            -o -name 'settings.gradle.kts' \) \
+            -print -exec sh -c '
+              echo
+              echo "========== $1 =========="
+              cat "$1"
+            ' _ {} \;

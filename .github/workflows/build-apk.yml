@@ -15,7 +15,10 @@ jobs:
   build:
     name: Test Flutter and Build Android APK
     runs-on: ubuntu-24.04
-    timeout-minutes: 60
+    timeout-minutes: 90
+
+    env:
+      ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
 
     steps:
       - name: Checkout repository
@@ -36,11 +39,19 @@ jobs:
           test -d extracted/velora/lib
           test -d extracted/velora/test
 
+      - name: Cache Android NDK
+        uses: actions/cache@v4
+        with:
+          path: /usr/local/lib/android/sdk/ndk
+          key: velora-android-ndk-r28c-v1
+
       - name: Set up Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: "17"
+          cache: gradle
+          cache-dependency-path: extracted/velora/android/**/gradle-wrapper.properties
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
@@ -53,6 +64,7 @@ jobs:
         run: |
           flutter --version
           java -version
+          df -h
 
       - name: Install Flutter dependencies
         working-directory: extracted/velora
@@ -64,7 +76,7 @@ jobs:
 
       - name: Build release APK
         working-directory: extracted/velora
-        run: flutter build apk --release
+        run: flutter build apk --release --verbose
 
       - name: Upload APK
         uses: actions/upload-artifact@v4

@@ -1,3 +1,4 @@
+
 name: VELORA - Test and Build APK
 
 on:
@@ -48,6 +49,9 @@ jobs:
           distribution: temurin
           java-version: "17"
 
+      - name: Set up Gradle cache
+        uses: gradle/actions/setup-gradle@v4
+
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
@@ -83,8 +87,10 @@ jobs:
           echo "=== Starting release build ==="
           timeout 45m flutter build apk --release --verbose 2>&1 | tee "$GITHUB_WORKSPACE/velora-build.log"
           BUILD_STATUS=${PIPESTATUS[0]}
+
           echo "=== Native libraries merge diagnostics ==="
           grep -n -A 35 -B 10 -E 'mergeReleaseNativeLibs|What went wrong|Caused by:|duplicate|2 files found|No space left|NDK' "$GITHUB_WORKSPACE/velora-build.log" | tail -160 || true
+
           exit "$BUILD_STATUS"
 
       - name: Upload build log

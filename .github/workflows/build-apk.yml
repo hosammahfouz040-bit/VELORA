@@ -80,7 +80,7 @@ jobs:
         working-directory: extracted/velora
         run: flutter test
 
-      -       - name: Build release APK
+            - name: Build release APK
         id: build_apk
         continue-on-error: true
         working-directory: extracted/velora

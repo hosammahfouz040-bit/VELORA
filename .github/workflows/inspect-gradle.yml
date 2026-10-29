@@ -42,3 +42,13 @@ jobs:
               echo "========== $1 =========="
               cat "$1"
             ' _ {} \;
+      - name: Inspect Android native files
+        shell: bash
+        run: |
+          echo "=== Android manifest ==="
+          find extracted/velora/android/app/src -name AndroidManifest.xml -print
+          find extracted/velora/android/app/src -name AndroidManifest.xml -exec cat {} \;
+          echo "=== Native libraries and NDK settings ==="
+          grep -RniE 'ndkVersion|abiFilters|jniLibs|pickFirst|useLegacyPackaging|externalNativeBuild' extracted/velora/android || true
+          echo "=== Flutter dependencies ==="
+          grep -nE 'media3|flutter|dependency_overrides' extracted/velora/pubspec.yaml || true

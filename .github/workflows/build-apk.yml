@@ -64,10 +64,12 @@ jobs:
 
       - name: Install Flutter dependencies
         working-directory: extracted/velora
+        shell: bash
         run: flutter pub get
 
       - name: Run Flutter tests
         working-directory: extracted/velora
+        shell: bash
         run: flutter test
 
       - name: Build release APK
@@ -76,22 +78,15 @@ jobs:
         working-directory: extracted/velora
         shell: bash
         run: |
-          set -o pipefail
-          echo "=== Flutter and Java versions ==="
-          flutter --version
-          java -version
-          echo "=== Requested NDK version ==="
-          grep -n 'ndkVersion' android/app/build.gradle.kts || true
-          echo "=== Starting release build ==="
           set +e
-timeout 20m flutter build apk --release --verbose 2>&1 \
-  | tee "$GITHUB_WORKSPACE/velora-build.log"
-BUILD_STATUS=${PIPESTATUS[0]}
-echo "=== Native libraries merge diagnostics ==="
-grep -n -A 35 -B 10 -E \
-  'mergeReleaseNativeLibs|What went wrong|Caused by:|duplicate|2 files found|No space left|NDK' \
-  "$GITHUB_WORKSPACE/velora-build.log" | tail -160 || true
-exit "$BUILD_STATUS"
+          set -o pipefail
+          echo "=== Starting release build ==="
+          timeout 20m flutter build apk --release --verbose 2>&1 | tee "$GITHUB_WORKSPACE/velora-build.log"
+          BUILD_STATUS=${PIPESTATUS[0]}
+          echo "=== Native libraries merge diagnostics ==="
+          grep -n -A 35 -B 10 -E 'mergeReleaseNativeLibs|What went wrong|Caused by:|duplicate|2 files found|No space left|NDK' "$GITHUB_WORKSPACE/velora-build.log" | tail -160 || true
+          exit "$BUILD_STATUS"
+
       - name: Upload build log
         if: always()
         uses: actions/upload-artifact@v4

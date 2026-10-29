@@ -1,4 +1,3 @@
-
 name: VELORA - Test and Build APK
 
 on:
@@ -37,26 +36,17 @@ jobs:
           set -e
           mkdir -p extracted
           unzip -q velora-github-source.zip -d extracted
-
           test -f extracted/velora/pubspec.yaml
           test -f extracted/velora/pubspec.lock
           test -f extracted/velora/android/gradlew
           test -d extracted/velora/lib
           test -d extracted/velora/test
 
-      - name: Cache Android NDK
-        uses: actions/cache@v4
-        with:
-          path: /usr/local/lib/android/sdk/ndk
-          key: velora-android-ndk-r28c-v1
-
       - name: Set up Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: "17"
-          cache: gradle
-          cache-dependency-path: extracted/velora/android/**/gradle-wrapper.properties
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
@@ -80,7 +70,7 @@ jobs:
         working-directory: extracted/velora
         run: flutter test
 
-            - name: Build release APK
+      - name: Build release APK
         id: build_apk
         continue-on-error: true
         working-directory: extracted/velora
@@ -95,6 +85,7 @@ jobs:
           echo "=== Starting release build ==="
           timeout 20m flutter build apk --release --verbose 2>&1 \
             | tee "$GITHUB_WORKSPACE/velora-build.log"
+
       - name: Upload build log
         if: always()
         uses: actions/upload-artifact@v4

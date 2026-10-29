@@ -81,7 +81,7 @@ jobs:
           set +e
           set -o pipefail
           echo "=== Starting release build ==="
-          timeout 20m flutter build apk --release --verbose 2>&1 | tee "$GITHUB_WORKSPACE/velora-build.log"
+          timeout 45m flutter build apk --release --verbose 2>&1 | tee "$GITHUB_WORKSPACE/velora-build.log"
           BUILD_STATUS=${PIPESTATUS[0]}
           echo "=== Native libraries merge diagnostics ==="
           grep -n -A 35 -B 10 -E 'mergeReleaseNativeLibs|What went wrong|Caused by:|duplicate|2 files found|No space left|NDK' "$GITHUB_WORKSPACE/velora-build.log" | tail -160 || true

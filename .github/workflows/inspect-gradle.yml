@@ -52,3 +52,25 @@ jobs:
           grep -RniE 'ndkVersion|abiFilters|jniLibs|pickFirst|useLegacyPackaging|externalNativeBuild' extracted/velora/android || true
           echo "=== Flutter dependencies ==="
           grep -nE 'media3|flutter|dependency_overrides' extracted/velora/pubspec.yaml || true
+      - name: Set up Flutter for diagnostics
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.47.8"
+          channel: stable
+          cache: true
+
+      - name: Inspect Flutter and NDK
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "=== Flutter version ==="
+          flutter --version
+          echo "=== Flutter NDK configuration ==="
+          grep -Rni 'ndkVersion' "$FLUTTER_ROOT/packages/flutter_tools/gradle" 2>/dev/null | head -30 || true
+          echo "=== Installed Android NDK versions ==="
+          ls -1 "${ANDROID_SDK_ROOT:-/usr/local/lib/android/sdk}/ndk" 2>/dev/null || true
+          echo "=== Native libraries in project ==="
+          find extracted/velora -type f -name '*.so' -print -exec du -h {} \;
+          echo "=== Disk and memory ==="
+          df -h
+          free -h
